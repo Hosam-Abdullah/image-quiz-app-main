@@ -183,7 +183,7 @@ export default function AdminPanel() {
               >
                 <CardMedia
                   component="img"
-                  image={`http://localhost:5000/${image.imagePath}`}
+                  image={`https://image-quiz-app-main.onrender.com//${image.imagePath}`}
                   alt="Uploaded image"
                   sx={{
                     position: "absolute",

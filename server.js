@@ -59,13 +59,31 @@ const quizProgressSchema = new mongoose.Schema({
 const QuizProgress = mongoose.model("QuizProgress", quizProgressSchema);
 
 // Routes
+// app.post("/api/upload", upload.single("image"), async (req, res) => {
+//   try {
+//     const { isCorrect } = req.body;
+//     const newImage = new Image({
+//       imagePath: req.file.path,
+//       isCorrect: isCorrect === "true",
+//     });
+//     await newImage.save();
+//     res.json({ success: true, image: newImage });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 app.post("/api/upload", upload.single("image"), async (req, res) => {
   try {
     const { isCorrect } = req.body;
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+
     const newImage = new Image({
-      imagePath: req.file.path,
+      imagePath: imageUrl,
       isCorrect: isCorrect === "true",
     });
+
     await newImage.save();
     res.json({ success: true, image: newImage });
   } catch (error) {
