@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: image-quiz-app
+    env: node
+    buildCommand: npm install && npm run client:build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # You'll need to set this in Render's dashboard
+    staticPublishPath: ./client/build # For serving the React frontend
