@@ -11,7 +11,11 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://image-quiz-app-main.vercel.app",
+  })
+);
 app.use(express.json());
 
 // Serve static files from uploads

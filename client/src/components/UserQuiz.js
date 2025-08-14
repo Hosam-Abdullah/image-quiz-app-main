@@ -41,7 +41,9 @@ const UserQuiz = () => {
 
   const fetchQuizPair = async () => {
     try {
-      const response = await axios.get("/api/quiz-pair");
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/quiz/pair`
+      );
 
       if (response.data.reset) {
         startNewQuiz();

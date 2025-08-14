@@ -44,7 +44,9 @@ export default function AdminPanel() {
 
   const fetchImages = async () => {
     try {
-      const response = await axios.get("/api/admin/images");
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/admin/images`
+      );
       setImages(response.data);
     } catch (error) {
       console.error("Error fetching images:", error);
@@ -67,11 +69,15 @@ export default function AdminPanel() {
     formData.append("isCorrect", isCorrect);
 
     try {
-      await axios.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/api/admin/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       showSnackbar("Image uploaded successfully", "success");
       setSelectedFile(null);
       fetchImages();
@@ -88,9 +94,12 @@ export default function AdminPanel() {
 
   const handleEditSave = async () => {
     try {
-      await axios.put(`/api/admin/images/${selectedImage._id}`, {
-        isCorrect: selectedImage.isCorrect,
-      });
+      await axios.put(
+        `${process.env.REACT_APP_API_BASE_URL}/api/admin/images/${selectedImage._id}`,
+        {
+          isCorrect: selectedImage.isCorrect,
+        }
+      );
       showSnackbar("Image updated successfully", "success");
       setEditDialogOpen(false);
       fetchImages();
@@ -103,7 +112,9 @@ export default function AdminPanel() {
   const handleDelete = async (imageId) => {
     if (window.confirm("Are you sure you want to delete this image?")) {
       try {
-        await axios.delete(`/api/admin/images/${imageId}`);
+        await axios.delete(
+          `${process.env.REACT_APP_API_BASE_URL}/api/admin/images/${imageId}`
+        );
         showSnackbar("Image deleted successfully", "success");
         fetchImages();
       } catch (error) {
@@ -176,7 +187,7 @@ export default function AdminPanel() {
               <Box
                 sx={{
                   position: "relative",
-                  paddingTop: "75%", // 4:3 aspect ratio
+                  paddingTop: "75%" // 4:3 aspect ratio
                   width: "100%",
                   bgcolor: "grey.100",
                 }}
