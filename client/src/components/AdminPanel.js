@@ -27,6 +27,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 
 export default function AdminPanel() {
+  const [authenticated, setAuthenticated] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isCorrect, setIsCorrect] = useState("true");
   const [images, setImages] = useState([]);
@@ -39,8 +40,17 @@ export default function AdminPanel() {
   });
 
   useEffect(() => {
-    fetchImages();
+    const password = prompt("Enter admin password:");
+    if (password === "yourpassword") {
+      setAuthenticated(true);
+    }
   }, []);
+
+  useEffect(() => {
+    if (authenticated) {
+      fetchImages();
+    }
+  }, [authenticated]);
 
   const fetchImages = async () => {
     try {
@@ -240,6 +250,10 @@ export default function AdminPanel() {
       </Grid>
     </Paper>
   );
+
+  if (!authenticated) {
+    return <div>Access Denied</div>;
+  }
 
   return (
     <Container maxWidth="lg">

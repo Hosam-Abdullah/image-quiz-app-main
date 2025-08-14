@@ -42,7 +42,7 @@ const UserQuiz = () => {
   const fetchQuizPair = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/api/quiz/pair`
+        `${process.env.REACT_APP_API_BASE_URL}/api/quiz-pair`
       );
 
       if (response.data.reset) {
@@ -353,7 +353,7 @@ const UserQuiz = () => {
                     <CardActionArea onClick={() => handleImageClick(image._id)}>
                       <CardMedia
                         component="img"
-                        image={`/${image.imagePath}`}
+                        image={image.imagePath}
                         alt={`Quiz Image ${index + 1}`}
                         sx={{
                           height: is1080p ? 500 : 300,

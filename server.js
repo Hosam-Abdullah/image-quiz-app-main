@@ -190,7 +190,11 @@ app.delete("/api/admin/images/:id", async (req, res) => {
     const image = await Image.findById(req.params.id);
     if (!image) return res.status(404).json({ error: "Image not found" });
 
-    fs.unlink(image.imagePath, async (err) => {
+    const filePath = image.imagePath.replace(
+      `${req.protocol}://${req.get("host")}/`,
+      ""
+    );
+    fs.unlink(filePath, async (err) => {
       if (err) console.error("Error deleting image file:", err);
       await Image.findByIdAndDelete(req.params.id);
       await QuizProgress.deleteMany({});
