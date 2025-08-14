@@ -189,7 +189,7 @@ export default function AdminPanel() {
               <Box
                 sx={{
                   position: "relative",
-                  paddingTop: "75%" // 4:3 aspect ratio
+                  paddingTop: "75%", // 4:3 aspect ratio
                   width: "100%",
                   bgcolor: "grey.100",
                 }}
