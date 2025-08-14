@@ -47,10 +47,12 @@ export default function AdminPanel() {
       const response = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/api/admin/images`
       );
-      setImages(response.data);
+      // Defensive: ensure images is always an array
+      setImages(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching images:", error);
       showSnackbar("Error fetching images", "error");
+      setImages([]); // Ensure images is always an array on error
     }
   };
 
@@ -70,7 +72,7 @@ export default function AdminPanel() {
 
     try {
       await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/admin/upload`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/upload`,
         formData,
         {
           headers: {
@@ -194,7 +196,7 @@ export default function AdminPanel() {
               >
                 <CardMedia
                   component="img"
-                  image={`https://image-quiz-app-main.onrender.com//${image.imagePath}`}
+                  image={image.imagePath}
                   alt="Uploaded image"
                   sx={{
                     position: "absolute",
