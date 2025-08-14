@@ -13,7 +13,11 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "https://image-quiz-app-main.vercel.app",
+    origin: [
+      "https://image-quiz-app-main.vercel.app",
+      "https://image-quiz-app-main-4143nguco-hosam-abdullahs-projects.vercel.app",
+    ],
+    credentials: true,
   })
 );
 app.use(express.json());
