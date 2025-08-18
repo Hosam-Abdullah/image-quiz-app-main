@@ -11,7 +11,7 @@ export default function SafetyScreen() {
       sx={{
         minHeight: "100vh",
         width: "100vw",
-        bgcolor: "#e3f6fd", // light blue
+        bgcolor: "#e3f6fd",
         position: "relative",
         overflow: "hidden",
         display: "flex",
@@ -19,42 +19,58 @@ export default function SafetyScreen() {
         justifyContent: "space-between",
       }}
     >
-      {/* Header Logos and Banner */}
+      {/* Header: Logos and Banner */}
       <Box
         sx={{
           width: "100%",
-          px: 3,
-          pt: 2,
+          px: { xs: 2, sm: 4, md: 8 },
+          pt: { xs: 2, sm: 3, md: 4 },
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "flex-start",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: { xs: 2, md: 6 },
         }}
       >
-        <img
-          src="/ministry-logo.png"
-          alt="Ministry Logo"
-          style={{ height: 70 }}
-        />
-        <Box sx={{ textAlign: "center", flex: 1 }}>
+        <Box sx={{ flex: 1, textAlign: "left" }}>
+          <img
+            src="/ministry-logo.png"
+            alt="Ministry Logo"
+            style={{
+              maxHeight: "120px",
+              width: "auto",
+              maxWidth: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
+        <Box sx={{ flex: 2, textAlign: "center" }}>
           <img
             src="/program-title.png"
-            alt="Program Banner"
-            style={{ height: 60, margin: "0 auto" }}
+            alt="Team Development And Skills Improvement Program"
+            style={{
+              maxHeight: "100px",
+              width: "auto",
+              maxWidth: "100%",
+              objectFit: "contain",
+            }}
           />
-          <Typography
-            sx={{ color: "#f00", fontWeight: "bold", fontSize: 18, mt: 1 }}
-          >
-            برنامج تطوير الفريق وتنمية المهارات
-          </Typography>
         </Box>
-        <img
-          src="/saudi-logo.png"
-          alt="Saudi Binladin Logo"
-          style={{ height: 60 }}
-        />
+        <Box sx={{ flex: 1, textAlign: "right" }}>
+          <img
+            src="/saudi-logo.png"
+            alt="Saudi Binladin Group Logo"
+            style={{
+              maxHeight: "160px",
+              width: "auto",
+              maxWidth: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
       </Box>
 
-      {/* Main Titles */}
+      {/* Main Title Section */}
       <Box sx={{ textAlign: "center", mt: 2 }}>
         <Typography
           sx={{
@@ -133,7 +149,7 @@ export default function SafetyScreen() {
           &copy;
         </span>
         &nbsp;Designer: مصباح نصّار &nbsp;|&nbsp; &nbsp; Developer: Hosam
-        Abdullah & Saeed Misbah &nbsp;
+        Abdullah &nbsp;
       </Box>
     </Box>
   );
