@@ -42,6 +42,8 @@ const UserQuiz = () => {
   const [currentPair, setCurrentPair] = useState(0);
   const [remainingPairs, setRemainingPairs] = useState(0);
   const [totalPairs, setTotalPairs] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [answerStatus, setAnswerStatus] = useState(null); // "correct" or "incorrect"
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -97,25 +99,34 @@ const UserQuiz = () => {
     fetchQuizPair();
   };
 
-  const handleImageClick = (imageId) => {
+  const handleImageClick = (imageId, index) => {
     if (isQuizComplete) return;
 
-    if (imageId === quizPair.correctImageId) {
-      setQuizResults((prev) => ({ ...prev, correct: prev.correct + 1 }));
-      setMessage({ type: "success", text: "Correct answer!" });
+    setSelectedImageIndex(index);
 
-      // If last question, show results
+    if (imageId === quizPair.correctImageId) {
+      setAnswerStatus("correct");
+      setQuizResults((prev) => ({ ...prev, correct: prev.correct + 1 }));
+      setMessage(null);
+
       if (remainingPairs === 0) {
         setIsQuizComplete(true);
       } else {
-        // Move to next question after a short delay
         setTimeout(() => {
+          setSelectedImageIndex(null);
+          setAnswerStatus(null);
           fetchQuizPair();
-        }, 1000); // 1 second delay for feedback
+        }, 1000);
       }
     } else {
+      setAnswerStatus("incorrect");
       setQuizResults((prev) => ({ ...prev, incorrect: prev.incorrect + 1 }));
-      setMessage({ type: "error", text: "Wrong answer. Try again!" });
+      setMessage(null);
+
+      setTimeout(() => {
+        setSelectedImageIndex(null);
+        setAnswerStatus(null);
+      }, 1000);
     }
   };
 
@@ -352,23 +363,72 @@ const UserQuiz = () => {
                       mx: "auto",
                       cursor: "pointer",
                       transition: "0.3s",
+                      position: "relative",
                       "&:hover": {
                         transform: "scale(1.02)",
                         boxShadow: 6,
                       },
                     }}
                   >
-                    <CardActionArea onClick={() => handleImageClick(image._id)}>
-                      <CardMedia
-                        component="img"
-                        image={getImageUrl(image.imagePath)}
-                        alt={`Quiz Image ${index + 1}`}
-                        sx={{
-                          height: is1080p ? 500 : 300,
-                          objectFit: "contain",
-                          bgcolor: "white",
-                        }}
-                      />
+                    <CardActionArea
+                      onClick={() => handleImageClick(image._id, index)}
+                    >
+                      <Box sx={{ position: "relative" }}>
+                        <CardMedia
+                          component="img"
+                          image={getImageUrl(image.imagePath)}
+                          alt={`Quiz Image ${index + 1}`}
+                          sx={{
+                            height: is1080p ? 500 : 300,
+                            objectFit: "contain",
+                            bgcolor: "white",
+                          }}
+                        />
+                        {selectedImageIndex === index && answerStatus && (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              bgcolor:
+                                answerStatus === "correct"
+                                  ? "rgba(76, 175, 80, 0.5)"
+                                  : "rgba(244, 67, 54, 0.5)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              zIndex: 2,
+                              animation: "fadeIn 0.5s",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 120,
+                                height: 120,
+                                borderRadius: "50%",
+                                bgcolor:
+                                  answerStatus === "correct"
+                                    ? "#4CAF50"
+                                    : "#f44336",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: 6,
+                                animation: "popIn 0.5s",
+                              }}
+                            >
+                              <Typography
+                                variant="h1"
+                                sx={{ color: "#fff", fontWeight: "bold" }}
+                              >
+                                {answerStatus === "correct" ? "✓" : "✗"}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        )}
+                      </Box>
                     </CardActionArea>
                   </Card>
                 </Grid>
@@ -403,7 +463,7 @@ const UserQuiz = () => {
         <span style={{ fontSize: "1.2em", verticalAlign: "middle" }}>
           &copy;
         </span>
-        &nbsp;Designer: مصباح نصّار &nbsp;|&nbsp; Programmer: Hosam Abdullah
+        &nbsp;Designer: مصباح نصّار &nbsp;|&nbsp; Developer: Hosam Abdullah
       </Box>
     </Box>
   );
