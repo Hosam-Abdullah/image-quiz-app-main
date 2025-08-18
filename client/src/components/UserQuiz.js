@@ -74,7 +74,6 @@ const UserQuiz = () => {
 
       // Shuffle the images
       const shuffledImages = [...images].sort(() => Math.random() - 0.5);
-
       setQuizPair({
         images: shuffledImages,
         correctImageId,
@@ -96,6 +95,8 @@ const UserQuiz = () => {
     setCurrentPair(0);
     setRemainingPairs(0);
     setIsQuizComplete(false);
+    setSelectedImageIndex(null);
+    setAnswerStatus(null);
     fetchQuizPair();
   };
 
