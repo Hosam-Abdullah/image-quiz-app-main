@@ -149,7 +149,7 @@ export default function SafetyScreen() {
           &copy;
         </span>
         &nbsp;Designer: مصباح نصّار &nbsp;|&nbsp; &nbsp; Developer: Hosam
-        Abdullah &nbsp;
+        Abdullah & Saeed Misbah &nbsp;
       </Box>
     </Box>
   );
