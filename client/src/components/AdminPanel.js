@@ -26,6 +26,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return "";
+  return imagePath.replace(
+    /^https?:\/\/[^/]+/,
+    "https://image-quiz-app-main.onrender.com"
+  );
+};
+
 export default function AdminPanel() {
   const [authenticated, setAuthenticated] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -200,13 +208,11 @@ export default function AdminPanel() {
                 sx={{
                   position: "relative",
                   paddingTop: "75%", // 4:3 aspect ratio
-                  width: "100%",
-                  bgcolor: "grey.100",
                 }}
               >
                 <CardMedia
                   component="img"
-                  image={image.imagePath}
+                  image={getImageUrl(image.imagePath)}
                   alt="Uploaded image"
                   sx={{
                     position: "absolute",
@@ -214,8 +220,8 @@ export default function AdminPanel() {
                     left: 0,
                     width: "100%",
                     height: "100%",
-                    objectFit: "contain", // This ensures the entire image is visible
-                    p: 1, // Add padding to prevent image from touching the edges
+                    objectFit: "contain",
+                    p: 1,
                   }}
                 />
               </Box>

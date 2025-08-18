@@ -25,6 +25,14 @@ import {
 } from "recharts";
 import axios from "axios";
 
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return "";
+  return imagePath.replace(
+    /^https?:\/\/[^/]+/,
+    "https://image-quiz-app-main.onrender.com"
+  );
+};
+
 const UserQuiz = () => {
   const [quizPair, setQuizPair] = useState(null);
   const [message, setMessage] = useState(null);
@@ -353,7 +361,7 @@ const UserQuiz = () => {
                     <CardActionArea onClick={() => handleImageClick(image._id)}>
                       <CardMedia
                         component="img"
-                        image={image.imagePath}
+                        image={getImageUrl(image.imagePath)}
                         alt={`Quiz Image ${index + 1}`}
                         sx={{
                           height: is1080p ? 500 : 300,
