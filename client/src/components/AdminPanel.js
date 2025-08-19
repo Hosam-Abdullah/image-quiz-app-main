@@ -62,6 +62,22 @@ export default function AdminPanel() {
     }
   }, [authenticated]);
 
+  // Helper to handle token expiry
+  const handleAuthError = (error) => {
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error === "Invalid token"
+    ) {
+      localStorage.removeItem("token");
+      setToken("");
+      setAuthenticated(false);
+      setLoginError("Session expired. Please log in again.");
+      return true;
+    }
+    return false;
+  };
+
   const fetchImages = async () => {
     try {
       const response = await axios.get(
@@ -70,9 +86,11 @@ export default function AdminPanel() {
       );
       setImages(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error("Error fetching images:", error);
-      showSnackbar("Error fetching images", "error");
-      setImages([]);
+      if (!handleAuthError(error)) {
+        console.error("Error fetching images:", error);
+        showSnackbar("Error fetching images", "error");
+        setImages([]);
+      }
     }
   };
 
@@ -104,8 +122,10 @@ export default function AdminPanel() {
       setSelectedFile(null);
       fetchImages();
     } catch (error) {
-      console.error("Error uploading image:", error);
-      showSnackbar("Error uploading image", "error");
+      if (!handleAuthError(error)) {
+        console.error("Error uploading image:", error);
+        showSnackbar("Error uploading image", "error");
+      }
     }
   };
 
@@ -127,8 +147,10 @@ export default function AdminPanel() {
       setEditDialogOpen(false);
       fetchImages();
     } catch (error) {
-      console.error("Error updating image:", error);
-      showSnackbar("Error updating image", "error");
+      if (!handleAuthError(error)) {
+        console.error("Error updating image:", error);
+        showSnackbar("Error updating image", "error");
+      }
     }
   };
 
@@ -142,8 +164,10 @@ export default function AdminPanel() {
         showSnackbar("Image deleted successfully", "success");
         fetchImages();
       } catch (error) {
-        console.error("Error deleting image:", error);
-        showSnackbar("Error deleting image", "error");
+        if (!handleAuthError(error)) {
+          console.error("Error deleting image:", error);
+          showSnackbar("Error deleting image", "error");
+        }
       }
     }
   };
@@ -162,6 +186,16 @@ export default function AdminPanel() {
     } catch (err) {
       setLoginError("Invalid credentials");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken("");
+    setAuthenticated(false);
+    setUsername("");
+    setPassword("");
+    setImages([]);
+    setLoginError("");
   };
 
   const showSnackbar = (message, severity) => {
@@ -328,6 +362,15 @@ export default function AdminPanel() {
         <Typography variant="h4" gutterBottom>
           Admin Panel
         </Typography>
+
+        <Button
+          variant="outlined"
+          color="secondary"
+          sx={{ mb: 2 }}
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
 
         {renderUploadSection()}
         {renderDashboard()}
