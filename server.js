@@ -170,13 +170,13 @@ app.get("/api/quiz-pair", async (req, res) => {
   }
 });
 
-app.post("/api/register", async (req, res) => {
-  const { username, password } = req.body;
-  const hashed = await bcrypt.hash(password, 10);
-  const user = new User({ username, password: hashed });
-  await user.save();
-  res.json({ success: true });
-});
+//app.post("/api/register", async (req, res) => {
+//  const { username, password } = req.body;
+//  const hashed = await bcrypt.hash(password, 10);
+//  const user = new User({ username, password: hashed });
+//  await user.save();
+//  res.json({ success: true });
+//});
 
 // Login
 app.post("/api/login", async (req, res) => {
