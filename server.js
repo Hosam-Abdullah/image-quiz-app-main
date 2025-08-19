@@ -6,6 +6,8 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
@@ -65,6 +67,13 @@ const quizProgressSchema = new mongoose.Schema({
   shownImageIds: [String],
 });
 const QuizProgress = mongoose.model("QuizProgress", quizProgressSchema);
+
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true }, // Store hashed password!
+});
+
+const User = mongoose.model("User", userSchema);
 
 // Routes
 // app.post("/api/upload", upload.single("image"), async (req, res) => {
@@ -161,7 +170,45 @@ app.get("/api/quiz-pair", async (req, res) => {
   }
 });
 
-app.get("/api/admin/images", async (req, res) => {
+app.post("/api/register", async (req, res) => {
+  const { username, password } = req.body;
+  const hashed = await bcrypt.hash(password, 10);
+  const user = new User({ username, password: hashed });
+  await user.save();
+  res.json({ success: true });
+});
+
+// Login
+app.post("/api/login", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await User.findOne({ username });
+  if (!user) return res.status(401).json({ error: "Invalid credentials" });
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) return res.status(401).json({ error: "Invalid credentials" });
+
+  // Create JWT token
+  const token = jwt.sign({ userId: user._id }, "your_jwt_secret", {
+    expiresIn: "1h",
+  });
+  res.json({ token });
+});
+
+// Middleware to protect admin routes
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: "No token" });
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    req.user = decoded;
+    next();
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
+  }
+}
+
+// Example: Protect admin image routes
+app.get("/api/admin/images", authMiddleware, async (req, res) => {
   try {
     const images = await Image.find().sort({ createdAt: 1 });
     res.json(images);
@@ -170,7 +217,7 @@ app.get("/api/admin/images", async (req, res) => {
   }
 });
 
-app.put("/api/admin/images/:id", async (req, res) => {
+app.put("/api/admin/images/:id", authMiddleware, async (req, res) => {
   try {
     const { isCorrect } = req.body;
     const image = await Image.findByIdAndUpdate(
@@ -185,7 +232,7 @@ app.put("/api/admin/images/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/admin/images/:id", async (req, res) => {
+app.delete("/api/admin/images/:id", authMiddleware, async (req, res) => {
   try {
     const image = await Image.findById(req.params.id);
     if (!image) return res.status(404).json({ error: "Image not found" });
@@ -242,3 +289,20 @@ process.on("SIGTERM", () => {
     process.exit(0);
   });
 });
+
+// Initial admin user setup
+async function createAdminUser() {
+  const adminExists = await User.findOne({ username: "admin" });
+  if (adminExists) return;
+
+  const hashedPassword = await bcrypt.hash("Admin@quiz99", 10);
+  const adminUser = new User({
+    username: "admin",
+    password: hashedPassword,
+  });
+  await adminUser.save();
+  console.log("✅ Admin user created");
+}
+
+// Uncomment to run once
+// createAdminUser();

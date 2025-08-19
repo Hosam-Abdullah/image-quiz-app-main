@@ -25,6 +25,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
+import TextField from "@mui/material/TextField";
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return "";
@@ -46,13 +47,14 @@ export default function AdminPanel() {
     message: "",
     severity: "success",
   });
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [loginError, setLoginError] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const password = prompt("Enter admin password:");
-    if (password === "yourpassword") {
-      setAuthenticated(true);
-    }
-  }, []);
+    if (token) setAuthenticated(true);
+  }, [token]);
 
   useEffect(() => {
     if (authenticated) {
@@ -63,14 +65,14 @@ export default function AdminPanel() {
   const fetchImages = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/api/admin/images`
+        `${process.env.REACT_APP_API_BASE_URL}/api/admin/images`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Defensive: ensure images is always an array
       setImages(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching images:", error);
       showSnackbar("Error fetching images", "error");
-      setImages([]); // Ensure images is always an array on error
+      setImages([]);
     }
   };
 
@@ -118,7 +120,8 @@ export default function AdminPanel() {
         `${process.env.REACT_APP_API_BASE_URL}/api/admin/images/${selectedImage._id}`,
         {
           isCorrect: selectedImage.isCorrect,
-        }
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       showSnackbar("Image updated successfully", "success");
       setEditDialogOpen(false);
@@ -133,7 +136,8 @@ export default function AdminPanel() {
     if (window.confirm("Are you sure you want to delete this image?")) {
       try {
         await axios.delete(
-          `${process.env.REACT_APP_API_BASE_URL}/api/admin/images/${imageId}`
+          `${process.env.REACT_APP_API_BASE_URL}/api/admin/images/${imageId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         showSnackbar("Image deleted successfully", "success");
         fetchImages();
@@ -141,6 +145,22 @@ export default function AdminPanel() {
         console.error("Error deleting image:", error);
         showSnackbar("Error deleting image", "error");
       }
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/api/login`,
+        { username, password }
+      );
+      localStorage.setItem("token", res.data.token);
+      setToken(res.data.token);
+      setAuthenticated(true);
+    } catch (err) {
+      setLoginError("Invalid credentials");
     }
   };
 
@@ -207,7 +227,7 @@ export default function AdminPanel() {
               <Box
                 sx={{
                   position: "relative",
-                  paddingTop: "75%", // 4:3 aspect ratio
+                  paddingTop: "75%",
                 }}
               >
                 <CardMedia
@@ -258,7 +278,48 @@ export default function AdminPanel() {
   );
 
   if (!authenticated) {
-    return <div>Access Denied</div>;
+    return (
+      <Container maxWidth="xs" sx={{ mt: 8 }}>
+        <Paper sx={{ p: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Admin Login
+          </Typography>
+          <form onSubmit={handleLogin}>
+            <TextField
+              label="Username"
+              fullWidth
+              margin="normal"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {loginError && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {loginError}
+              </Alert>
+            )}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Login
+            </Button>
+          </form>
+        </Paper>
+      </Container>
+    );
   }
 
   return (
